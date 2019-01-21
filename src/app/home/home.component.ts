@@ -13,9 +13,12 @@ import {Store} from '../common/store.service';
 })
 export class HomeComponent implements OnInit {
 
-    beginnerCourses$: Observable<Course[]>;
+    // beginnerCourses$: Observable<Course[]>;
 
-    advancedCourses$: Observable<Course[]>;
+    // advancedCourses$: Observable<Course[]>;
+
+    beginnerCourses: Course[];
+    advancedCourses: Course[];
 
 
     constructor(private store:Store) {
@@ -24,11 +27,23 @@ export class HomeComponent implements OnInit {
 
     ngOnInit() {
 
-        const courses$ = this.store.courses$;
+        const http$ = createHttpObservable('/api/courses');
 
-        this.beginnerCourses$ = this.store.selectBeginnerCourses();
+        const courses$ = http$
+            .pipe(
+                map(res => Object.values(res['payload']))
+            );
 
-        this.advancedCourses$ = this.store.selectAdvancedCourses();
+        courses$.subscribe(
+            courses => {
+                this.beginnerCourses = courses
+                    .filter(course => course.category === 'BEGINNER');
+                this.advancedCourses = courses
+                    .filter(course => course.category === 'ADVANCED');
+            },
+            noop,
+            () => console.log('completed')
+        );
 
     }
 
