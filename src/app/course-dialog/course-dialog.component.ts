@@ -13,7 +13,7 @@ import {Store} from '../common/store.service';
     templateUrl: './course-dialog.component.html',
     styleUrls: ['./course-dialog.component.css']
 })
-export class CourseDialogComponent implements AfterViewInit {
+export class CourseDialogComponent implements AfterViewInit, OnInit {
 
     form: FormGroup;
 
@@ -26,8 +26,8 @@ export class CourseDialogComponent implements AfterViewInit {
     constructor(
         private fb: FormBuilder,
         private dialogRef: MatDialogRef<CourseDialogComponent>,
-        @Inject(MAT_DIALOG_DATA) course:Course,
-        private store:Store) {
+        @Inject(MAT_DIALOG_DATA) course: Course,
+        private store: Store) {
 
         this.course = course;
 
@@ -40,7 +40,32 @@ export class CourseDialogComponent implements AfterViewInit {
 
     }
 
+    ngOnInit() {
+        this.form.valueChanges
+            .pipe(
+                filter(() => this.form.valid),
+                mergeMap(changes => this.saveCourse(changes))
+            )
+            .subscribe();
+    }
+
+    saveCourse(changes) {
+        return fromPromise(fetch(`/api/courses/${this.course.id}`, {
+            method: 'PUT',
+            body: JSON.stringify(changes),
+            headers: {
+                'content-type': 'application/json'
+            }
+        }));
+    }
+
     ngAfterViewInit() {
+
+        fromEvent(this.saveButton.nativeElement, 'click')
+            .pipe(
+                exhaustMap(() => this.saveCourse(this.form.value))
+            )
+            .subscribe();
 
     }
 

@@ -22,14 +22,14 @@ export class Store {
 
         const http$ = createHttpObservable('/api/courses');
 
-        http$
-            .pipe(
-                tap(() => console.log('HTTP request executed')),
-                map(res => Object.values(res['payload']))
-            )
-            .subscribe(
-                courses => this.subject.next(courses)
-            );
+        // http$
+        //     .pipe(
+        //         tap(() => console.log('HTTP request executed')),
+        //         map(res => Object.values(res['payload']))
+        //     )
+        //     .subscribe(
+        //         courses => this.subject.next(courses)
+        //     );
     }
 
     selectBeginnerCourses() {
@@ -43,7 +43,7 @@ export class Store {
     selectCourseById(courseId:number) {
         return this.courses$
             .pipe(
-                map(courses => courses.find(course => course.id == courseId)),
+                map(courses => courses.find(course => course.id === courseId)),
                 filter(course => !!course)
 
             );
@@ -53,7 +53,7 @@ export class Store {
         return this.courses$
             .pipe(
                 map(courses => courses
-                    .filter(course => course.category == category))
+                    .filter(course => course.category === category))
             );
     }
 
