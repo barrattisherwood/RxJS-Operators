@@ -14,7 +14,7 @@ import {
     AsyncSubject,
     ReplaySubject
 } from 'rxjs';
-import {delayWhen, filter, map, take, timeout} from 'rxjs/operators';
+import {delayWhen, filter, map, take, timeout, subscribeOn} from 'rxjs/operators';
 import {createHttpObservable} from '../common/util';
 
 
@@ -27,13 +27,11 @@ export class AboutComponent implements OnInit {
 
     ngOnInit() {
 
-        const interval1$ = interval(1000);
+        const http$= createHttpObservable('/api/courses');
 
-        const interval2$ = interval1$.pipe(map(val => 10 * val));
+        const sub = http$.subscribe(console.log);
 
-        const result$ = merge(interval1$, interval2$);
-
-        result$.subscribe(console.log);
+        setTimeout(() => sub.unsubscribe(), 0);
 
     }
 
